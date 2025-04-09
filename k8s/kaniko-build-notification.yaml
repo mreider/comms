@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: build-notification-service
+  namespace: comms
+spec:
+  template:
+    spec:
+      containers:
+        - name: kaniko
+          image: gcr.io/kaniko-project/executor:v1.8.0
+          args:
+            - "--context=git://github.com/mreider/comms.git#main"
+            - "--dockerfile=notification_service/Dockerfile"
+            - "--destination=zot-service:80/notification-service:latest"
+            - "--insecure"
+            - "--skip-tls-verify"
+      restartPolicy: Never

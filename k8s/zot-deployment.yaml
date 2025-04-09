@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zot
+  labels:
+    app: zot
+  namespace: comms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zot
+  template:
+    metadata:
+      labels:
+        app: zot
+    spec:
+      containers:
+        - name: zot
+          image: ghcr.io/project-zot/zot:v2.1.2
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ZOT_LOG_LEVEL
+              value: "debug"
+          volumeMounts:
+            - name: zot-storage
+              mountPath: /var/lib/zot
+      volumes:
+        - name: zot-storage
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zot-service
+  namespace: comms
+spec:
+  selector:
+    app: zot
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
